@@ -1,0 +1,242 @@
+@echo off
+title KRYPTOMB ENGINE
+set TARGET_DIR=E:\Kryptomb_Workspace
+
+:menu
+cls
+color 0C
+echo.
+echo  ╦╔═╦═╗╦ ╦╔═╗╔╦╗╔═╗╔╦╗╔═╗
+echo  ╠╩╗╠╦╝╚╦╝╠═╝ ║ ║ ║║║║╠╩╗
+echo  ╩ ╩╩╚═ ╩ ╩   ╩ ╚═╝╩ ╩╩ ╩
+echo ===================================================
+echo   [!] SOVEREIGN CRYPTOGRAPHIC CORE ONLINE [!]     
+echo ===================================================
+echo   [1] Run Sovereign Engine (secure_engine.exe)
+echo   [2] PGP Operations (Keys / Signatures / Encrypt)
+echo   [3] Decrypt Rolling Code Payload (Extract File)
+echo   [4] View Stored PGP Keys Matrix (.key / .asc)
+echo   [5] Initialize Real-Time Entropy Scrambler [Live]
+echo   [6] Verify Workspace Payload Status
+echo   [7] Clear Screen / Refresh Menu
+echo   [8] Exit Terminal
+echo ===================================================
+echo.
+
+echo Select an option [1-8]: 
+choice /c 12345678 /n
+
+if errorlevel 8 goto exit_menu
+if errorlevel 7 goto menu
+if errorlevel 6 goto inspect_payload
+if errorlevel 5 goto live_scramble
+if errorlevel 4 goto view_pgp_keys
+if errorlevel 3 goto decrypt_payload_menu
+if errorlevel 2 goto pgp_crypto_menu
+if errorlevel 1 goto run_engine
+
+:run_engine
+echo.
+echo [-] Initializing cryptographic core...
+echo ---------------------------------------------------
+cd /d "E:\"
+".\secure_engine.exe"
+echo ---------------------------------------------------
+echo.
+echo Press any key to return to menu...
+pause >nul
+goto menu
+
+:pgp_crypto_menu
+cls
+echo.
+echo  ╦╔═╦═╗╦ ╦╔═╗╔╦╗╔═╗╔╦╗╔═╗
+echo  ╠╩╗╠╦╝╚╦╝╠═╝ ║ ║ ║║║║╠╩╗
+echo  ╩ ╩╩╚═ ╩ ╩   ╩ ╚═╝╩ ╩╩ ╩
+echo ===================================================
+echo   PGP KEY GENERATION & SECURE DEPLOYMENT
+echo ===================================================
+set /p USERID="1. Enter Target Identity/Email: "
+
+echo.
+echo 2. Select Core Profile:
+echo    [A] Hardened Ed25519 (Recommended)
+echo    [B] Legacy RSA (4096-bit)
+choice /c AB /n
+if errorlevel 2 (set ALGO=rsa) else (set ALGO=ed25519)
+
+echo.
+echo [-] Compiling primary PGP key pair...
+cd /d "E:\"
+".\secure_engine.exe" --gen-key --algo %ALGO% --id "%USERID%" --mode standard --dialect none
+echo [-] PGP Key pair generated successfully.
+echo ---------------------------------------------------
+echo.
+echo 3. CHOOSE ROLLING CODE WRAPPING ENVELOPMENT:
+echo    [1] Keep Raw PGP Key (Standard Syntax Structure)
+echo    [2] ARM PAYLOAD: Encrypt Key with HMAC-SHA256 Shifting Window
+choice /c 12 /n
+if errorlevel 1 set DEPLOY=standard
+if errorlevel 2 set DEPLOY=rolling_code
+
+set GLYPH_MODE=none
+set STRENGTH=standard
+if "%DEPLOY%"=="rolling_code" (
+    echo.
+    echo 4. SELECT ROLLING CODE SYMBOL DIALECT:
+    echo    [1] Global Numerals & Multilingual Symbols
+    echo    [2] Pure Kryptomb Proprietary Language Mapping
+    choice /c 12 /n
+    if errorlevel 2 (set GLYPH_MODE=kryptomb_lang) else (set GLYPH_MODE=multilang)
+
+    echo.
+    echo 5. SELECT TUNNEL ENTROPY DEPTH:
+    echo    [1] Standard 32-bit Rolling Window (High-Speed Processing)
+    echo    [2] Hardened 64-bit Deep Variable Mesh (Anti-Brute Force)
+    choice /c 12 /n
+    if errorlevel 2 (set STRENGTH=hardened_deep) else (set STRENGTH=standard)
+)
+
+cls
+echo.
+echo  ╦╔═╦═╗╦ ╦╔═╗╔╦╗╔═╗╔╦╗╔═╗
+echo  ╠╩╗╠╦╝╚╦╝╠═╝ ║ ║ ║║║║╠╩╗
+echo  ╩ ╩╩╚═ ╩ ╩   ╩ ╚═╝╩ ╩╩ ╩
+echo ===================================================
+echo   EXECUTE FINAL ENVELOPE ENCRYPTION PIPELINE
+echo ===================================================
+echo   TARGET IDENTITY:   %USERID%
+echo   BASE CRYPTO ALGO:  %ALGO%
+echo   POST-DEPLOY MODE:  %DEPLOY%
+echo   RUNE DIALECT:      %GLYPH_MODE%
+echo   ENTROPY DEPTH:     %STRENGTH%
+echo ---------------------------------------------------
+if "%DEPLOY%"=="rolling_code" (
+    echo   [!] ARMED: Passing output key files directly back to
+    echo       the shifting engine to wrap them in a "%GLYPH_MODE%" 
+    echo       rolling envelope with [%STRENGTH%] complexity.
+) else (
+    echo   [-] NOTICE: Key files stored raw. No rolling code layer.
+)
+echo ---------------------------------------------------
+echo.
+echo Press any key to authorize processing and storage...
+pause >nul
+
+cd /d "E:\"
+if "%DEPLOY%"=="rolling_code" (
+    ".\secure_engine.exe" --encrypt-payload --target-id "%USERID%" --mode %DEPLOY% --dialect %GLYPH_MODE% --depth %STRENGTH%
+) else (
+    echo [-] Raw key configuration completed.
+)
+echo.
+echo Press any key to return to menu...
+pause >nul
+goto menu
+
+:decrypt_payload_menu
+cls
+echo.
+echo  ╦╔═╦═╗╦ ╦╔═╗╔╦╗╔═╗╔╦╗╔═╗
+echo  ╠╩╗╠╦╝╚╦╝╠═╝ ║ ║ ║║║║╠╩╗
+echo  ╩ ╩╩╚═ ╩ ╩   ╩ ╚═╝╩ ╩╩ ╩
+echo ===================================================
+echo   DECRYPT ROLLING CODE PAYLOAD MATRIX
+echo ===================================================
+set /p SOURCE_FILE="1. Enter Target File Path (e.g., E:\Kryptomb_Workspace\payload.enc): "
+
+echo.
+echo 2. SELECT ROLLING CODE SYMBOL DIALECT USED:
+echo    [1] Global Numerals & Multilingual Symbols
+echo    [2] Pure Kryptomb Proprietary Language Mapping
+choice /c 12 /n
+if errorlevel 2 (set DEC_GLYPH=kryptomb_lang) else (set DEC_GLYPH=multilang)
+
+echo.
+echo 3. SELECT TUNNEL ENTROPY DEPTH USED:
+echo    [1] Standard 32-bit Rolling Window
+echo    [2] Hardened 64-bit Deep Variable Mesh
+choice /c 12 /n
+if errorlevel 2 (set DEC_STRENGTH=hardened_deep) else (set DEC_STRENGTH=standard)
+
+cls
+echo.
+echo  ╦╔═╦═╗╦ ╦╔═╗╔╦╗╔═╗╔╦╗╔═╗
+echo  ╠╩╗╠╦╝╚╦╝╠═╝ ║ ║ ║║║║╠╩╗
+echo  ╩ ╩╩╚═ ╩ ╩   ╩ ╚═╝╩ ╩╩ ╩
+echo ===================================================
+echo   INITIALIZING INVERSE CRYPTOGRAPHIC EXTRACTION
+echo ===================================================
+echo   DECRYPTING FILE: %SOURCE_FILE%
+echo   USING DIALECT:   %DEC_GLYPH%
+echo   USING DEPTH:     %DEC_STRENGTH%
+echo ---------------------------------------------------
+echo   Processing decryption array...
+echo ---------------------------------------------------
+echo.
+
+cd /d "E:\"
+".\secure_engine.exe" --decrypt-payload --file "%SOURCE_FILE%" --dialect %DEC_GLYPH% --depth %DEC_STRENGTH%
+
+echo.
+echo ---------------------------------------------------
+echo   Extraction sequence halted.
+echo ---------------------------------------------------
+echo.
+echo Press any key to return to menu...
+pause >nul
+goto menu
+
+:view_pgp_keys
+cls
+echo.
+echo  ╦╔═╦═╗╦ ╦╔═╗╔╦╗╔═╗╔╦╗╔═╗
+echo  ╠╩╗╠╦╝╚╦╝╠═╝ ║ ║ ║║║║╠╩╗
+echo  ╩ ╩╩╚═ ╩ ╩   ╩ ╚═╝╩ ╩╩ ╩
+echo ===================================================
+echo   STORED CRYPTOGRAPHIC KEYS & CERTIFICATES DIRECTORY
+echo ===================================================
+echo  Scanning root drive space and target workspace...
+echo ---------------------------------------------------
+echo.
+echo  === [E:\ Root Directory Keys] ===
+dir "E:\*.key" "E:\*.asc" "E:\*.pub" "E:\*.pgp" /b /s 2>nul
+echo.
+echo  === [Workspace Encrypted Payloads] ===
+dir "%TARGET_DIR%\*" /b 2>nul
+echo ---------------------------------------------------
+echo.
+echo Press any key to return to menu...
+pause >nul
+goto menu
+
+:live_scramble
+cls
+echo ===================================================
+echo   KRYPTOMB // LIVE ENTROPY MATRIX SCRAMBLER
+echo   PRESS [CTRL + C] TO BREAK LOOP AND RETURN TO SHELL
+echo ===================================================
+echo.
+echo   [!] ARMED ENTROPY STREAM LOG:
+echo.
+
+:scramble_loop
+<nul set /p ="   >>> CORE_ENTROPY: %RANDOM%%RANDOM%%RANDOM%%RANDOM%%RANDOM% "
+goto scramble_loop
+
+:inspect_payload
+echo.
+echo [-] Current Workspace Payload (%TARGET_DIR%):
+echo ---------------------------------------------------
+dir "%TARGET_DIR%\sensitive_data*" 2>nul
+echo ---------------------------------------------------
+echo.
+echo Press any key to return to menu...
+pause >nul
+goto menu
+
+:exit_menu
+cls
+color 07
+echo Workspace closed. Sovereign engine standing by.
+echo.
